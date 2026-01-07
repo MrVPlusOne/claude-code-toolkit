@@ -32,29 +32,50 @@ else
 fi
 
 # Handle settings.json
+NEEDS_MANUAL_SETTINGS=false
 if [[ -f "$SETTINGS_FILE" ]]; then
+  NEEDS_MANUAL_SETTINGS=true
   echo
   echo "WARNING: $SETTINGS_FILE already exists."
-  echo "You need to manually merge the hooks from settings.json.example"
-  echo "into your existing settings.json file."
+  echo "Please add the following hooks section to your settings.json:"
   echo
-  echo "Example file: $SCRIPT_DIR/settings.json.example"
+  echo "─────────────────────────────────────────────────────────"
+  cat "$SCRIPT_DIR/settings.json.example"
+  echo "─────────────────────────────────────────────────────────"
 else
   echo "Installing settings.json..."
   cp "$SCRIPT_DIR/settings.json.example" "$SETTINGS_FILE"
 fi
 
 echo
-echo "Installation complete!"
+if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
+  echo "Scripts installed. Please update your settings.json to complete setup."
+else
+  echo "Installation complete!"
+fi
 echo
 echo "Next steps:"
-echo "1. For Pushover notifications, set these environment variables:"
+if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
+  echo "1. Add the hooks above to your settings.json"
+  echo
+  echo "2. For Pushover notifications, set these environment variables:"
+else
+  echo "1. For Pushover notifications, set these environment variables:"
+fi
 echo "   export PUSHOVER_API_TOKEN='your-api-token'"
 echo "   export PUSHOVER_USER_KEY='your-user-key'"
 echo
-echo "2. To view the dashboard, run:"
-echo "   ~/.claude/scripts/monitor_dashboard.sh"
-echo "   or: watch -n 1 ~/.claude/scripts/dashboard.sh"
+if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
+  echo "3. To view the dashboard, run:"
+else
+  echo "2. To view the dashboard, run:"
+fi
+echo "   ~/.claude/scripts/dashboard.sh          # one-time view"
+echo "   ~/.claude/scripts/dashboard.sh --watch  # live refresh"
 echo
-echo "3. (Optional) Install VS Code extension 'jiayiwei.uri-notifier'"
+if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
+  echo "4. (Optional) Install VS Code extension 'jiayiwei.uri-notifier'"
+else
+  echo "3. (Optional) Install VS Code extension 'jiayiwei.uri-notifier'"
+fi
 echo "   for in-editor notifications"

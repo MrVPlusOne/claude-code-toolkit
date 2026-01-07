@@ -15,5 +15,6 @@ description: Fetch remote changes and rebase local commits on top
 ## Your task
 - If there's no upstream tracking branch configured, or there's no changes to rebase, inform the user and stop.
 - If there are new commits on remote, read to understand them first. This helps you capture any potential semantic conflicts that slip through git rebase.
+- If you have uncommited local changes, first commit them using the `/commit` command or stash them.
 - Then rebase your local changes on top of the remote branch. Resolve any conflicts carefully, ensuring the final code is correct.
 
