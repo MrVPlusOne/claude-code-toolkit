@@ -89,12 +89,12 @@ Install the `uri-notifier` VS Code extension for in-editor notifications.
 
 Live monitoring (refreshes every second):
 ```bash
-~/.claude/scripts/monitor_dashboard.sh
+~/.claude/scripts/dashboard.sh --watch
 ```
 
-Or manually:
+One-time display:
 ```bash
-watch -n 1 ~/.claude/scripts/dashboard.sh
+~/.claude/scripts/dashboard.sh
 ```
 
 ### Dashboard Display
@@ -124,8 +124,7 @@ Status indicators:
 | `working.sh` | PreToolUse | Update status to "working" |
 | `notify.sh` | Notification, Stop | Send notifications + update dashboard |
 | `session_end.sh` | SessionEnd | Remove instance from dashboard |
-| `dashboard.sh` | Manual | Display terminal dashboard |
-| `monitor_dashboard.sh` | Manual | Watch wrapper for dashboard.sh |
+| `dashboard.sh` | Manual | Display dashboard (`--watch` for live refresh) |
 
 ## Prerequisites
 

@@ -1,7 +1,12 @@
 #!/bin/bash
 # Claude Dashboard - displays status of all Claude instances
-# Usage: dashboard.sh
-#        watch -n 1 ~/.claude/scripts/dashboard.sh
+# Usage: dashboard.sh           # Show once
+#        dashboard.sh --watch   # Live refresh every second
+
+# Handle --watch / -w flag
+if [[ "$1" == "--watch" || "$1" == "-w" ]]; then
+  exec watch -n 1 -c "$0"
+fi
 
 DASHBOARD_FILE="$HOME/.claude/dashboard.json"
 MACHINE=$(hostname -s)

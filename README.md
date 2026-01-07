@@ -68,7 +68,7 @@ Use slash commands in Claude Code:
 Monitor all running Claude instances:
 
 ```bash
-~/.claude/scripts/monitor_dashboard.sh
+~/.claude/scripts/dashboard.sh --watch
 ```
 
 ## Requirements
