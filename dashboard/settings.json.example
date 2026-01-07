@@ -1,11 +1,21 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/dashboard_hooks.sh working"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Task completed' 0 pushover"
+            "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Awaiting your input' 0 pushover"
           }
         ]
       }
@@ -26,17 +36,6 @@
           {
             "type": "command",
             "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Permission required' 1 bike"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh working"
           }
         ]
       }
