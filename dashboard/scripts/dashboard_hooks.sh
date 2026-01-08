@@ -1,7 +1,8 @@
 #!/bin/bash
-# Claude Code unified hook handler
-# Usage: dashboard_hooks.sh <action> [args...]
-#   actions: new_session, working, notify, session_end
+# Claude Code dashboard hook handler
+# Usage: dashboard_hooks.sh <status> [--notify [priority] [sound]]
+#
+# Statuses: working, waiting, permission, new_session, remove
 
 set -e
 
@@ -51,10 +52,11 @@ urlencode() {
 
 # Send notifications (VS Code + Pushover)
 send_notifications() {
-  local title="$1"
-  local message="$2"
-  local priority="${3:-0}"
-  local sound="${4:-pushover}"
+  local message="$1"
+  local priority="${2:-0}"
+  local sound="${3:-pushover}"
+
+  local title="Claude Code ($PROJECT_ID@$MACHINE)"
 
   # VS Code notification via URI handler
   local encoded_title=$(urlencode "$title")
@@ -73,68 +75,48 @@ send_notifications() {
   fi
 }
 
-# --- Action handlers ---
-
-action_new_session() {
-  update_dashboard "new_session" "New session"
-}
-
-action_working() {
-  update_dashboard "working" "Processing..."
-}
-
-action_notify() {
-  local message="${1:-Notification}"
-  local priority="${2:-0}"
-  local sound="${3:-pushover}"
-
-  # Determine status based on message content
-  local status="waiting"
-  if [[ "$message" == *"Permission"* ]]; then
-    status="permission"
-  elif [[ "$message" == *"completed"* ]] || [[ "$message" == *"stopped"* ]]; then
-    status="stopped"
-  fi
-
-  update_dashboard "$status" "$message"
-
-  # Build title
-  local title="Claude Code ($PROJECT_ID@$MACHINE)"
-  send_notifications "$title" "$message" "$priority" "$sound"
-}
-
-action_session_end() {
-  # Read hook input from stdin to get the reason
-  local input=$(cat)
-  local reason=$(echo "$input" | jq -r '.reason // "other"' 2>/dev/null)
-
-  # Don't remove on "clear" - new_session will update it
-  if [[ "$reason" != "clear" ]]; then
-    remove_dashboard
-  fi
-}
-
 # --- Main ---
 
-ACTION="$1"
+STATUS="$1"
 shift || true
 
-case "$ACTION" in
-  new_session)
-    action_new_session
-    ;;
+# Parse --notify flag
+NOTIFY=false
+PRIORITY=0
+SOUND="pushover"
+if [[ "$1" == "--notify" ]]; then
+  NOTIFY=true
+  PRIORITY="${2:-0}"
+  SOUND="${3:-pushover}"
+fi
+
+# Status → message mapping
+case "$STATUS" in
   working)
-    action_working
+    MESSAGE="Processing..."
     ;;
-  notify)
-    action_notify "$@"
+  waiting)
+    MESSAGE="Awaiting your input"
     ;;
-  session_end)
-    action_session_end
+  permission)
+    MESSAGE="Permission required"
+    ;;
+  new_session)
+    MESSAGE="New session"
+    ;;
+  remove)
+    remove_dashboard
+    exit 0
     ;;
   *)
-    echo "Usage: dashboard_hooks.sh <action> [args...]"
-    echo "Actions: new_session, working, notify, session_end"
+    echo "Usage: dashboard_hooks.sh <status> [--notify [priority] [sound]]"
+    echo "Statuses: working, waiting, permission, new_session, remove"
     exit 1
     ;;
 esac
+
+update_dashboard "$STATUS" "$MESSAGE"
+
+if [[ "$NOTIFY" == true ]]; then
+  send_notifications "$MESSAGE" "$PRIORITY" "$SOUND"
+fi

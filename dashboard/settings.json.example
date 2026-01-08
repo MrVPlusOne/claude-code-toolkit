@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Awaiting your input' 0 pushover"
+            "command": "~/.claude/scripts/dashboard_hooks.sh waiting"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Awaiting your input' 1 siren"
+            "command": "~/.claude/scripts/dashboard_hooks.sh waiting --notify 1 siren"
           }
         ]
       },
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh notify 'Permission required' 1 bike"
+            "command": "~/.claude/scripts/dashboard_hooks.sh permission --notify 1 bike"
           }
         ]
       }
@@ -65,7 +65,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/dashboard_hooks.sh session_end"
+            "command": "~/.claude/scripts/dashboard_hooks.sh remove"
           }
         ]
       }
