@@ -81,7 +81,15 @@ Add these to your `~/.bashrc` or `~/.zshrc` for persistence.
 
 ### VS Code Notifications (Optional)
 
-Install the `uri-notifier` VS Code extension for in-editor notifications.
+During installation, you'll be asked if you want VS Code notifications. If enabled:
+
+1. Install the `jiayiwei.uri-notifier` VS Code extension
+2. The setting is stored in `~/.claude/dashboard_config.json`
+
+To change later, edit `~/.claude/dashboard_config.json`:
+```json
+{"vscode_notify": true}
+```
 
 ## Usage
 

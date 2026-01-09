@@ -9,6 +9,7 @@ CLAUDE_DIR="$HOME/.claude"
 SCRIPTS_DIR="$CLAUDE_DIR/scripts"
 DASHBOARD_FILE="$CLAUDE_DIR/dashboard.json"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
+CONFIG_FILE="$CLAUDE_DIR/dashboard_config.json"
 
 echo "Claude Dashboard Installer"
 echo "=========================="
@@ -29,6 +30,19 @@ if [[ ! -f "$DASHBOARD_FILE" ]]; then
   echo '{"instances":{}}' > "$DASHBOARD_FILE"
 else
   echo "dashboard.json already exists, skipping..."
+fi
+
+# Ask about VS Code notifications
+echo
+read -rp "Enable VS Code notifications? (requires jiayiwei.uri-notifier extension) [y/N]: " ENABLE_VSCODE
+ENABLE_VSCODE=${ENABLE_VSCODE:-n}
+
+if [[ "$ENABLE_VSCODE" =~ ^[Yy]$ ]]; then
+  echo '{"vscode_notify": true}' > "$CONFIG_FILE"
+  VSCODE_ENABLED=true
+else
+  echo '{"vscode_notify": false}' > "$CONFIG_FILE"
+  VSCODE_ENABLED=false
 fi
 
 # Handle settings.json
@@ -55,27 +69,27 @@ else
 fi
 echo
 echo "Next steps:"
+
+STEP=1
 if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
-  echo "1. Add the hooks above to your settings.json"
+  echo "$STEP. Add the hooks above to your settings.json"
   echo
-  echo "2. For Pushover notifications, set these environment variables:"
-else
-  echo "1. For Pushover notifications, set these environment variables:"
+  ((STEP++))
 fi
+
+echo "$STEP. For Pushover notifications, set these environment variables:"
 echo "   export PUSHOVER_API_TOKEN='your-api-token'"
 echo "   export PUSHOVER_USER_KEY='your-user-key'"
 echo
-if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
-  echo "3. To view the dashboard, run:"
-else
-  echo "2. To view the dashboard, run:"
-fi
+((STEP++))
+
+echo "$STEP. To view the dashboard, run:"
 echo "   ~/.claude/scripts/dashboard.sh          # one-time view"
 echo "   ~/.claude/scripts/dashboard.sh --watch  # live refresh"
-echo
-if [[ "$NEEDS_MANUAL_SETTINGS" == true ]]; then
-  echo "4. (Optional) Install VS Code extension 'jiayiwei.uri-notifier'"
-else
-  echo "3. (Optional) Install VS Code extension 'jiayiwei.uri-notifier'"
+
+if [[ "$VSCODE_ENABLED" == true ]]; then
+  echo
+  ((STEP++))
+  echo "$STEP. Install VS Code extension: jiayiwei.uri-notifier"
 fi
-echo "   for in-editor notifications"
+echo

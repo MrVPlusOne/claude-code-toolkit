@@ -7,8 +7,18 @@
 set -e
 
 DASHBOARD_FILE="$HOME/.claude/dashboard.json"
+CONFIG_FILE="$HOME/.claude/dashboard_config.json"
 MACHINE=$(hostname -s)
 PROJECT_ID=$(basename "$PWD")
+
+# Check if VS Code notifications are enabled in config
+vscode_notify_enabled() {
+  if [[ -f "$CONFIG_FILE" ]] && command -v jq &> /dev/null; then
+    [[ $(jq -r '.vscode_notify // false' "$CONFIG_FILE") == "true" ]]
+  else
+    false
+  fi
+}
 
 # Initialize dashboard file if needed
 init_dashboard() {
@@ -58,10 +68,17 @@ send_notifications() {
 
   local title="Claude Code ($PROJECT_ID@$MACHINE)"
 
-  # VS Code notification via URI handler
-  local encoded_title=$(urlencode "$title")
-  local encoded_msg=$(urlencode "$message")
-  xdg-open "vscode://jiayiwei.uri-notifier?title=${encoded_title}&msg=${encoded_msg}" 2>/dev/null &
+  # VS Code notification via URI handler (enabled via install.sh)
+  if vscode_notify_enabled; then
+    local encoded_title=$(urlencode "$title")
+    local encoded_msg=$(urlencode "$message")
+    local uri="vscode://jiayiwei.uri-notifier?title=${encoded_title}&msg=${encoded_msg}"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      open "$uri" 2>/dev/null &
+    else
+      xdg-open "$uri" 2>/dev/null &
+    fi
+  fi
 
   # Pushover notification
   if [[ -n "$PUSHOVER_API_TOKEN" && -n "$PUSHOVER_USER_KEY" ]]; then
